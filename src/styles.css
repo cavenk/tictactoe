@@ -1,0 +1,29 @@
+body{
+    background-color: #d15c5c;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+}
+
+.cell{
+    width: 5rem;
+    height: 5rem;
+    background-color: white;
+    border-radius: 10px;
+    font-size: 4rem;
+    cursor: pointer;
+}
+
+.button{
+    width: auto;
+    background-color: black;
+    color: white;
+    border-radius: 10px;
+    padding: 0.2rem 1.5rem;
+}
+
+.font-white{
+    color : white
+}
