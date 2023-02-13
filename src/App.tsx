@@ -1,59 +1,39 @@
 import { useEffect, useState } from "react"
 import { Cell } from "./Cell"
+import { isDraw, isWinner } from "./utils"
 
 export function App(){
-  const [moves, setMoves] = useState<(string|null)[]>(Array(9).fill(null))
-  const [turn, setTurn] = useState<"X" | "O">("X")
-  const [winner, setWinner] = useState<boolean>(false)
-
-  const winningCombination = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6]
-  ]
+  const [moves, setMoves] = useState<Moves>(Array(9).fill(null))
+  const [turn, setTurn] = useState<Turn>("X")
+  const [status, setStatus] = useState<Status>(null)
 
   const reset = ()=>{
     setMoves(state => state.map((v) => null)) 
-    setTurn("O")
-    setWinner(false)
+    setTurn("X")
+    setStatus(null)
   }
 
-  const showMessage = () => winner ? `'${turn}' win!` : `'${turn}' turn`
+  const showMessage = () => status === "winner" ? `'${turn}' win!` : status === "draw" ? "It's a draw" : `'${turn}' turn`
 
   const changeTurn = () => setTurn((state : string) => state === "X" ? "O" : "X")
 
   const onClick = (index : number) =>
     () => {
-      if(winner || moves[index])
+      if(status || moves[index])
         return
 
-      setMoves(state => state.map((v, i) => i === index ? turn : v))
+      const updatedMoves = moves.map((v, i) => i === index ? turn : v)
+      setMoves(updatedMoves)
+
+      if(isWinner(updatedMoves, turn))
+        setStatus("winner")
+      else if(isDraw(updatedMoves))
+        setStatus("draw")
+      else
+        changeTurn()
     }
 
-  const showCells = () => moves.map((v : string | null, i : number) => <Cell key={i} value={v} onClick={onClick(i)} />)
-
-  const isWinner = ()=>{
-    for(let combination of winningCombination){
-      const isWin = combination.every((v : number) => moves[v] === turn)
-      if(isWin)
-        return true
-    }
-    return false
-  }
-
-  
-
-  useEffect(()=>{
-    if(isWinner())
-      setWinner(true)
-    else
-      changeTurn()
-  }, [moves])
+  const showCells = () => moves.map((v : Turn | null, i : number) => <Cell key={i} value={v} onClick={onClick(i)} />)
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center">
